@@ -1,0 +1,168 @@
+openapi: 3.0.3
+info:
+  version: develop
+  title: OpenAPI Code Gen Sample Spec
+  description: "Playground test"
+servers:
+  - url: "https://{host}:8080/api"
+    variables:
+      host:
+        default: localhost
+        description: local address
+components:
+  schemas:
+    Basic01:
+      type: object
+      description: "Notice how everything is marked as implicitly nullable in the generated output, because nothing is required, there are no defaults, and nullable: true isnt set for anything."
+      properties:
+        SomeString:
+          type: string
+          description: "Notice the capitialization of the SomeString field, derived from the spec"
+        SomeInt:
+          type: integer
+          description: "An integer, specifically not a float"
+        SomeDouble:
+          type: number
+          format: double
+          description: "Using format: double gets us a double"
+        SomeBool:
+          type: boolean
+          description: "Generic boolean"
+    BasicWithDefaults:
+      type: object
+      description: "Shows how defaults get used to supply default values in generted code. Nothing is nullable because default values are supplied."
+      properties:
+        DefaultString:
+          type: string
+          default: "hello"
+        DefaultInt:
+          type: integer
+          default: 99
+        DefaultDouble:
+          type: number
+          format: double
+          default: 137.2
+        DefaultBool:
+          type: boolean
+          default: true
+    BasicWithRequired:
+      type: object
+      description: "Shows how required can generate non-nullable code.
+        Notice how the NonRequired fields are marked as nullable in the output"
+      required: [RequiredString, RequiredInt]
+      properties:
+        RequiredString:
+          type: string
+        RequiredInt:
+          type: integer
+        NonRequiredBool:
+          type: boolean
+          nullable: true
+        NonRequiredDouble:
+          type: number
+          format: double
+          nullable: true
+    BasicWithNullables:
+      type: object
+      description: "Shows how nullable can be used restrict "
+      required: [RequiredButCanBeNullString, RequiredButCanNotBeNullString]
+      properties:
+        RequiredButCanBeNullString:
+          type: string
+          nullable: true
+        RequiredButCanNotBeNullString:
+          type: string
+        NotRequiredCanBeNullOrUndefinedString:
+          type: string
+    BasicWithNotRequiredButDefualts:
+      type: object
+      properties:
+        NotRequiredStringWithDefault:
+          type: string
+          description: "This field is nullable in the output source code, but a default is supplied anyway"
+          default: "Not Null"
+    Complex01:
+      type: object
+      description: "Shows how an object can contain other objects"
+      required: [SomeId]
+      properties:
+        SomeId:
+          type: string
+        Basic:
+          description: "Basic inner item"
+          $ref: "#/components/schemas/Basic01"
+
+paths:
+  /basic/01:
+    get:
+      tags:
+        - basic
+      description: "Notice how the operationId is the method name in the generated code"
+      operationId: basic01
+      responses:
+        200:
+          description: "get basic object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Basic01"
+  /basic/defaults:
+    get:
+      tags:
+        - basic
+      operationId: defaults
+      responses:
+        200:
+          description: "get basic default object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BasicWithDefaults"
+  /basic/required:
+    get:
+      tags:
+        - basic
+      operationId: required
+      responses:
+        200:
+          description: "get basic required object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BasicWithRequired"
+  /basic/nullable:
+    get:
+      tags:
+        - basic
+      operationId: nullable
+      responses:
+        200:
+          description: "get basic nullable object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BasicWithNullables"
+  /basic/requireddefaults:
+    get:
+      tags:
+        - basic
+      operationId: RequiredDefault
+      responses:
+        200:
+          description: "get basic object with required and defaults"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BasicWithNotRequiredButDefualts"
+  /complex/01:
+    get:
+      tags:
+        - complex
+      operationId: complex01
+      responses:
+        200:
+          description: "get normall complex object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Complex01"
